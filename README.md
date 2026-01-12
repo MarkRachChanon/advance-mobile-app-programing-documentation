@@ -564,13 +564,13 @@ export default function JobDetail() {
 
 ## <a name="step8">8. การรันโปรเจค</a>
 
-### 8.1 Clear Cache และรันโปรเจค
+### 8.1 รันโปรเจค
 
 ```bash
-npx expo start --clear
+npx expo start
 ```
 
-**สำคัญ:** ใช้ `--clear` เพื่อลบ cache ทุกครั้งที่รันครั้งแรก
+**สำคัญ:** ใช้ `--clear` เพื่อลบ cache ได้
 
 ### 8.2 เลือกแพลตฟอร์ม
 
