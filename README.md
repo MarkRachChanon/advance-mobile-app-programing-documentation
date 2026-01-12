@@ -1,55 +1,65 @@
 # 📱 คู่มือการสร้างแอป IT Worker ด้วย React Native + Expo Router
 
-## เกี่ยวกับโปรเจค
+## 🎯 เกี่ยวกับโปรเจค
 
 แอปพลิเคชันค้นหางานในสายอาชีพ IT ที่พัฒนาด้วย:
 - ⚛️ React Native
-- 📘 TypeScript
+- 📘 TypeScript  
 - 🎨 Nativewind (Tailwind CSS)
 - 🧭 Expo Router (File-based Routing)
-
-**ความสามารถ:**
-- แสดงรายการงาน IT ทั้งหมด
-- ดูรายละเอียดของแต่ละตำแหน่งงาน
-- Navigation แบบ File-based Routing
 
 ---
 
 ## 📋 สารบัญ
 
-1. [การติดตั้งและสร้างโปรเจค](#step1)
+1. [สร้างโปรเจคและติดตั้ง Expo Router](#step1)
 2. [ทำความเข้าใจ Expo Router](#step2)
-3. [โครงสร้างโปรเจค](#step3)
-4. [สร้างไฟล์ Types](#step4)
-5. [สร้างข้อมูลทดสอบ](#step5)
+3. [ตั้งค่าโปรเจคให้พร้อมใช้งาน](#step3)
+4. [สร้างโครงสร้างโฟลเดอร์](#step4)
+5. [สร้างไฟล์ Types และ Data](#step5)
 6. [สร้าง Component](#step6)
-7. [สร้างหน้าจอ](#step7)
+7. [สร้างหน้าจอด้วย Expo Router](#step7)
 8. [การรันโปรเจค](#step8)
 9. [การแก้ปัญหา](#troubleshooting)
 10. [สรุปและเอกสารอ้างอิง](#summary)
 
 ---
 
-## <a name="step1">1. การติดตั้งและสร้างโปรเจค</a>
+## <a name="step1">1. สร้างโปรเจคและติดตั้ง Expo Router</a>
 
 ### 1.1 สร้างโปรเจค
 
 ```bash
 npx rn-new it-worker --nativewind
 cd it-worker
-npm install expo-router
 ```
 
-คำสั่งนี้จะสร้างโปรเจคพร้อม:
-- ✅ Expo Router
-- ✅ TypeScript
-- ✅ Nativewind (Tailwind CSS)
+**หมายเหตุ:** โปรเจคที่สร้างจะมีโครงสร้างแบบนี้:
 
-**ไม่ต้องติดตั้งอะไรเพิ่ม!**
+```
+it-worker/
+├── assets/
+├── components/
+├── node_modules/
+├── App.tsx              ← ไฟล์หลัก (จะลบทิ้งในขั้นตอนถัดไป)
+├── app.json
+├── babel.config.js
+├── package.json
+├── tailwind.config.js
+└── tsconfig.json
+```
+
+### 1.2 ติดตั้ง Expo Router และ Dependencies
+
+```bash
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
+```
+
+**รอให้การติดตั้งเสร็จสิ้น** (ประมาณ 1-2 นาที)
 
 **อ้างอิง:**
-- [Nativewind Installation](https://www.nativewind.dev/docs/getting-started/installation)
-- [Expo Router Documentation](https://docs.expo.dev/router/introduction/)
+- [Expo Router - Installation](https://docs.expo.dev/router/installation/)
+- [Nativewind Documentation](https://www.nativewind.dev/)
 
 ---
 
@@ -65,20 +75,18 @@ Expo Router คือระบบ Navigation แบบ **File-based Routing** �
 
 ```
 app/
+├── _layout.tsx         →  Layout หลัก
 ├── index.tsx           →  หน้าแรก (/)
-├── about.tsx           →  หน้า About (/about)
 └── job/
     └── [id].tsx       →  หน้ารายละเอียด (/job/1, /job/2)
 ```
 
 **ข้อดี:**
-- ✅ ไม่ต้องตั้งค่า Navigation
+- ✅ ไม่ต้องตั้งค่า Navigation ซับซ้อน
 - ✅ ชื่อไฟล์ = URL path
 - ✅ เข้าใจง่าย ดูแลง่าย
 
 #### 2.2 Dynamic Routes
-
-ใช้วงเล็บก้ามปู `[id].tsx` สำหรับ Dynamic Parameters
 
 ```typescript
 // app/job/[id].tsx
@@ -87,66 +95,135 @@ import { useLocalSearchParams } from 'expo-router';
 export default function JobDetail() {
   const { id } = useLocalSearchParams();
   // URL: /job/1 → id = "1"
-  // URL: /job/2 → id = "2"
 }
 ```
 
 #### 2.3 การนำทาง
 
 ```typescript
-import { Link, router } from 'expo-router';
+import { router } from 'expo-router';
 
-// วิธีที่ 1: ใช้ Link
-<Link href="/job/1">ดูรายละเอียด</Link>
-
-// วิธีที่ 2: ใช้ router.push
+// นำทางไปหน้าอื่น
 router.push('/job/1');
-
-// วิธีที่ 3: ส่ง params
-router.push({
-  pathname: '/job/[id]',
-  params: { id: '1' }
-});
 ```
 
 **อ้างอิง:**
+- [Expo Router - Introduction](https://docs.expo.dev/router/introduction/)
 - [File-based Routing](https://docs.expo.dev/router/create-pages/)
-- [Dynamic Routes](https://docs.expo.dev/router/reference/url-parameters/)
-- [Navigation](https://docs.expo.dev/router/navigating-pages/)
 
 ---
 
-## <a name="step3">3. โครงสร้างโปรเจค</a>
+## <a name="step3">3. ตั้งค่าโปรเจคให้พร้อมใช้งาน</a>
+
+### 3.1 แก้ไข package.json
+
+เปิดไฟล์ `package.json` และแก้ไขบรรทัด `"main"`:
+
+```json
+{
+  "name": "it-worker",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  }
+}
+```
+
+**เปลี่ยน:** 
+- ❌ `"main": "node_modules/expo/AppEntry.js"`
+- ✅ `"main": "expo-router/entry"`
+
+### 3.2 ลบไฟล์ App.tsx
+
+```bash
+# สำหรับ Mac/Linux
+rm App.tsx
+
+# สำหรับ Windows (PowerShell)
+Remove-Item App.tsx
+```
+
+**เหตุผล:** เราจะใช้ Expo Router แทน ซึ่งใช้โฟลเดอร์ `app/` แทนไฟล์ `App.tsx`
+
+### 3.3 ตรวจสอบไฟล์ Config
+
+#### ตรวจสอบ `babel.config.js`
+
+```javascript
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    plugins: ['nativewind/babel'],
+  };
+};
+```
+
+#### ตรวจสอบ `tailwind.config.js`
+
+```javascript
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}"
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+---
+
+## <a name="step4">4. สร้างโครงสร้างโฟลเดอร์</a>
+
+### 4.1 สร้างโฟลเดอร์ทั้งหมด
+
+```bash
+# สร้างโฟลเดอร์หลัก
+mkdir app
+mkdir app/job
+mkdir types
+mkdir data
+
+# โฟลเดอร์ components มีอยู่แล้ว (ไม่ต้องสร้าง)
+```
+
+### 4.2 โครงสร้างสุดท้าย
 
 ```
 it-worker/
-├── app/
-│   ├── _layout.tsx          # Layout หลัก
-│   ├── index.tsx            # หน้าแรก
-│   └── job/
-│       └── [id].tsx         # หน้ารายละเอียด
+├── app/                     ← สร้างใหม่
+│   ├── _layout.tsx         ← จะสร้างในขั้นตอนถัดไป
+│   ├── index.tsx           ← จะสร้างในขั้นตอนถัดไป
+│   └── job/                ← สร้างใหม่
+│       └── [id].tsx        ← จะสร้างในขั้นตอนถัดไป
+├── assets/
 ├── components/
-│   └── JobCard.tsx          # Component การ์ด
-├── data/
-│   └── jobs.ts              # ข้อมูลทดสอบ
-├── types/
-│   └── job.ts               # TypeScript Types
+│   └── JobCard.tsx         ← จะสร้างในขั้นตอนถัดไป
+├── data/                    ← สร้างใหม่
+│   └── jobs.ts             ← จะสร้างในขั้นตอนถัดไป
+├── types/                   ← สร้างใหม่
+│   └── job.ts              ← จะสร้างในขั้นตอนถัดไป
+├── node_modules/
 ├── app.json
+├── babel.config.js
 ├── package.json
+├── tailwind.config.js
 └── tsconfig.json
 ```
 
 ---
 
-## <a name="step4">4. สร้างไฟล์ Types</a>
+## <a name="step5">5. สร้างไฟล์ Types และ Data</a>
 
-### สร้างโฟลเดอร์และไฟล์
-
-```bash
-mkdir types
-```
-
-### `types/job.ts`
+### 5.1 สร้างไฟล์ `types/job.ts`
 
 ```typescript
 // types/job.ts
@@ -162,17 +239,7 @@ export interface Job {
 }
 ```
 
----
-
-## <a name="step5">5. สร้างข้อมูลทดสอบ</a>
-
-### สร้างโฟลเดอร์และไฟล์
-
-```bash
-mkdir data
-```
-
-### `data/jobs.ts`
+### 5.2 สร้างไฟล์ `data/jobs.ts`
 
 ```typescript
 // data/jobs.ts
@@ -190,7 +257,7 @@ export const jobs: Job[] = [
       'มีประสบการณ์ React อย่างน้อย 2 ปี',
       'เชี่ยวชาญ HTML, CSS, JavaScript',
       'เข้าใจหลักการ Responsive Design',
-      'มีประสบการณ์ใช้ Git และ GitHub'
+      'มีประสบการณ์ใช้ Git'
     ],
     type: 'Full-time'
   },
@@ -200,12 +267,12 @@ export const jobs: Job[] = [
     company: 'Startup B',
     salary: '45,000 - 70,000 บาท',
     location: 'เชียงใหม่',
-    description: 'พัฒนา API และระบบ Backend ด้วย Node.js รองรับผู้ใช้งานจำนวนมาก ออกแบบฐานข้อมูลและเขียน API ที่มีประสิทธิภาพ',
+    description: 'พัฒนา API และระบบ Backend ด้วย Node.js รองรับผู้ใช้งานจำนวนมาก',
     requirements: [
       'เชี่ยวชาญ Node.js และ Express',
       'มีประสบการณ์ Database (MySQL/MongoDB)',
-      'เข้าใจ RESTful API และ GraphQL',
-      'มีความรู้เรื่อง Security และ Authentication'
+      'เข้าใจ RESTful API',
+      'มีความรู้เรื่อง Security'
     ],
     type: 'Full-time'
   },
@@ -215,11 +282,11 @@ export const jobs: Job[] = [
     company: 'Digital Agency C',
     salary: '35,000 - 55,000 บาท',
     location: 'ระยอง',
-    description: 'พัฒนาแอปมือถือด้วย React Native สำหรับ iOS และ Android ทำงานร่วมกับทีม Backend และ Designer',
+    description: 'พัฒนาแอปมือถือด้วย React Native สำหรับ iOS และ Android',
     requirements: [
       'มีประสบการณ์ React Native',
-      'เข้าใจ Mobile UI/UX Patterns',
-      'สามารถ Deploy แอปได้ทั้ง iOS และ Android',
+      'เข้าใจ Mobile UI/UX',
+      'สามารถ Deploy แอปได้',
       'มีความรู้เรื่อง Push Notification'
     ],
     type: 'Full-time'
@@ -230,12 +297,12 @@ export const jobs: Job[] = [
     company: 'Creative Studio D',
     salary: '30,000 - 50,000 บาท',
     location: 'กรุงเทพฯ',
-    description: 'ออกแบบ User Interface และ User Experience สำหรับเว็บและแอปมือถือ ทำ User Research และสร้าง Prototype',
+    description: 'ออกแบบ User Interface และ User Experience สำหรับเว็บและแอปมือถือ',
     requirements: [
       'เชี่ยวชาญ Figma หรือ Adobe XD',
       'เข้าใจหลักการ Design Thinking',
-      'มี Portfolio ผลงานที่หลากหลาย',
-      'สามารถทำ User Research ได้'
+      'มี Portfolio ผลงาน',
+      'สามารถทำ User Research'
     ],
     type: 'Full-time'
   },
@@ -245,7 +312,7 @@ export const jobs: Job[] = [
     company: 'Finance Corp E',
     salary: '38,000 - 58,000 บาท',
     location: 'กรุงเทพฯ',
-    description: 'วิเคราะห์ข้อมูลธุรกิจและสร้าง Dashboard สำหรับผู้บริหาร ใช้ข้อมูลในการตัดสินใจทางธุรกิจ',
+    description: 'วิเคราะห์ข้อมูลธุรกิจและสร้าง Dashboard สำหรับผู้บริหาร',
     requirements: [
       'เชี่ยวชาญ Excel, SQL',
       'มีประสบการณ์ Data Visualization',
@@ -260,12 +327,12 @@ export const jobs: Job[] = [
     company: 'Cloud Services F',
     salary: '50,000 - 80,000 บาท',
     location: 'กรุงเทพฯ',
-    description: 'จัดการ Infrastructure และ CI/CD Pipeline ดูแลระบบ Cloud และ Monitoring',
+    description: 'จัดการ Infrastructure และ CI/CD Pipeline ดูแลระบบ Cloud',
     requirements: [
       'มีประสบการณ์ AWS หรือ GCP',
       'เชี่ยวชาญ Docker และ Kubernetes',
       'เข้าใจ CI/CD Pipeline',
-      'มีความรู้เรื่อง Linux Administration'
+      'มีความรู้ Linux Administration'
     ],
     type: 'Full-time'
   }
@@ -276,13 +343,7 @@ export const jobs: Job[] = [
 
 ## <a name="step6">6. สร้าง Component</a>
 
-### สร้างโฟลเดอร์และไฟล์
-
-```bash
-mkdir components
-```
-
-### `components/JobCard.tsx`
+### สร้างไฟล์ `components/JobCard.tsx`
 
 ```typescript
 // components/JobCard.tsx
@@ -299,7 +360,7 @@ export default function JobCard({ job, onPress }: JobCardProps) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      className="bg-white p-4 rounded-xl mb-3 shadow-sm border border-gray-200 active:scale-98"
+      className="bg-white p-4 rounded-xl mb-3 shadow-sm border border-gray-200"
     >
       <Text className="text-lg font-bold text-gray-800 mb-1">
         {job.title}
@@ -331,9 +392,9 @@ export default function JobCard({ job, onPress }: JobCardProps) {
 
 ---
 
-## <a name="step7">7. สร้างหน้าจอ</a>
+## <a name="step7">7. สร้างหน้าจอด้วย Expo Router</a>
 
-### 7.1 Layout หลัก - `app/_layout.tsx`
+### 7.1 สร้างไฟล์ `app/_layout.tsx`
 
 ```typescript
 // app/_layout.tsx
@@ -369,7 +430,7 @@ export default function Layout() {
 }
 ```
 
-### 7.2 หน้าแรก - `app/index.tsx`
+### 7.2 สร้างไฟล์ `app/index.tsx`
 
 ```typescript
 // app/index.tsx
@@ -383,7 +444,6 @@ export default function Home() {
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <View className="flex-1 px-4 pt-4">
-        {/* Header */}
         <View className="mb-4">
           <Text className="text-3xl font-bold text-gray-800 mb-2">
             งาน IT
@@ -393,7 +453,6 @@ export default function Home() {
           </Text>
         </View>
 
-        {/* Job List */}
         <FlatList
           data={jobs}
           keyExtractor={(item) => item.id.toString()}
@@ -412,7 +471,7 @@ export default function Home() {
 }
 ```
 
-### 7.3 หน้ารายละเอียด - `app/job/[id].tsx`
+### 7.3 สร้างไฟล์ `app/job/[id].tsx`
 
 ```typescript
 // app/job/[id].tsx
@@ -438,7 +497,6 @@ export default function JobDetail() {
   return (
     <SafeAreaView className="flex-1 bg-white">
       <ScrollView className="flex-1">
-        {/* Header Section */}
         <View className="bg-blue-50 px-4 pt-6 pb-8">
           <Text className="text-2xl font-bold text-gray-800 mb-2">
             {job.title}
@@ -461,9 +519,7 @@ export default function JobDetail() {
           </View>
         </View>
 
-        {/* Content Section */}
         <View className="px-4 pt-6">
-          {/* Salary */}
           <View className="mb-6">
             <Text className="text-lg font-bold text-gray-800 mb-2">
               💰 เงินเดือน
@@ -475,7 +531,6 @@ export default function JobDetail() {
             </View>
           </View>
 
-          {/* Description */}
           <View className="mb-6">
             <Text className="text-lg font-bold text-gray-800 mb-2">
               📝 รายละเอียดงาน
@@ -485,7 +540,6 @@ export default function JobDetail() {
             </Text>
           </View>
 
-          {/* Requirements */}
           <View className="mb-8">
             <Text className="text-lg font-bold text-gray-800 mb-3">
               ✅ คุณสมบัติที่ต้องการ
@@ -510,38 +564,88 @@ export default function JobDetail() {
 
 ## <a name="step8">8. การรันโปรเจค</a>
 
-### 8.1 รันโปรเจค
+### 8.1 Clear Cache และรันโปรเจค
 
 ```bash
-npx expo start
+npx expo start --clear
 ```
+
+**สำคัญ:** ใช้ `--clear` เพื่อลบ cache ทุกครั้งที่รันครั้งแรก
 
 ### 8.2 เลือกแพลตฟอร์ม
 
-- กด `i` → iOS Simulator
-- กด `a` → Android Emulator
+หลังจากรันคำสั่งจะมี QR Code ปรากฏขึ้น:
+
+- กด `i` → iOS Simulator (ต้องมี Xcode)
+- กด `a` → Android Emulator (ต้องมี Android Studio)
 - กด `w` → Web Browser
-- สแกน QR Code → มือถือจริง (ต้องติดตั้ง Expo Go)
+- **สแกน QR Code** → มือถือจริง (ต้องติดตั้ง Expo Go App)
 
-### 8.3 ทดสอบการทำงาน
+### 8.3 ติดตั้ง Expo Go App (สำหรับมือถือจริง)
 
-1. ✅ เปิดแอปเห็นรายการงาน 6 ตำแหน่ง
+- **iOS:** [Expo Go บน App Store](https://apps.apple.com/app/expo-go/id982107779)
+- **Android:** [Expo Go บน Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
+
+### 8.4 ทดสอบการทำงาน
+
+1. ✅ เปิดแอปเห็นหน้าแรกแสดงรายการงาน 6 ตำแหน่ง
 2. ✅ กดที่การ์ดงานใดก็ได้
 3. ✅ ไปยังหน้ารายละเอียดของงานนั้น
 4. ✅ กดปุ่ม Back กลับหน้าแรก
+5. ✅ Tailwind CSS ทำงานถูกต้อง (มีสี, border, spacing)
 
 ---
 
 ## <a name="troubleshooting">9. การแก้ปัญหา</a>
 
-### ปัญหา 1: Tailwind ไม่ทำงาน
+### ⚠️ ปัญหา 1: Cannot find module 'expo-router'
+
+**สาเหตุ:** expo-router ยังไม่ได้ติดตั้ง
 
 **วิธีแก้:**
 
-1. ตรวจสอบ `tailwind.config.js`
+```bash
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
+```
+
+---
+
+### ⚠️ ปัญหา 2: Unable to resolve "../../../App"
+
+**สาเหตุ:** package.json ยังไม่ได้แก้ไข
+
+**วิธีแก้:**
+
+1. เปิด `package.json`
+2. แก้ไข `"main"`:
+
+```json
+{
+  "main": "expo-router/entry"
+}
+```
+
+3. **ลบไฟล์ `App.tsx`** (สำคัญมาก!)
+
+```bash
+rm App.tsx
+```
+
+4. รันใหม่
+
+```bash
+npx expo start --clear
+```
+
+---
+
+### ⚠️ ปัญหา 3: Tailwind ไม่ทำงาน
+
+**วิธีแก้:**
+
+1. ตรวจสอบ `tailwind.config.js`:
 
 ```javascript
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./app/**/*.{js,jsx,ts,tsx}",
@@ -554,51 +658,125 @@ module.exports = {
 }
 ```
 
-2. ตรวจสอบ `babel.config.js`
+2. ตรวจสอบ `babel.config.js`:
 
 ```javascript
 module.exports = function (api) {
   api.cache(true);
   return {
     presets: ['babel-preset-expo'],
-    plugins: ["nativewind/babel"],
+    plugins: ['nativewind/babel'],
   };
 };
 ```
 
-3. ลบ cache และรันใหม่
+3. **Clear cache และรันใหม่:**
 
 ```bash
-npx expo start -c
+npx expo start --clear
 ```
 
-### ปัญหา 2: TypeScript Error
+---
+
+### ⚠️ ปัญหา 4: หน้าจอว่างเปล่า (White Screen)
 
 **วิธีแก้:**
 
-ตรวจสอบ `tsconfig.json` มี config นี้
+1. **ตรวจสอบ Terminal** หา Error Message
+2. **ตรวจสอบโครงสร้างโฟลเดอร์:**
 
-```json
-{
-  "extends": "expo/tsconfig.base",
-  "compilerOptions": {
-    "strict": true
-  }
-}
+```
+app/
+├── _layout.tsx    ← ต้องมี!
+├── index.tsx
+└── job/
+    └── [id].tsx
 ```
 
-### ปัญหา 3: Navigation ไม่ทำงาน
+3. **Reload แอป:**
+   - กด `r` ใน Terminal
+   - หรือเขย่ามือถือแล้วเลือก "Reload"
+
+4. **Clear cache:**
+
+```bash
+npx expo start --clear
+```
+
+---
+
+### ⚠️ ปัญหา 5: Import path error
+
+**ข้อความ Error:**
+```
+Unable to resolve "./data/jobs" from "app/index.tsx"
+```
 
 **วิธีแก้:**
 
-1. ตรวจสอบโครงสร้างโฟลเดอร์ `app/`
-2. ตรวจสอบชื่อไฟล์ให้ถูกต้อง
-3. Restart Expo Dev Server
+1. ตรวจสอบ import path ให้ถูกต้อง:
+
+```typescript
+// ✅ ถูกต้อง (จาก app/index.tsx)
+import { jobs } from '../data/jobs';
+import JobCard from '../components/JobCard';
+
+// ❌ ผิด
+import { jobs } from './data/jobs';
+import JobCard from './components/JobCard';
+```
+
+2. ตรวจสอบว่าไฟล์มีอยู่จริง:
 
 ```bash
-# กด Ctrl+C แล้วรันใหม่
-npx expo start
+ls data/jobs.ts
+ls components/JobCard.tsx
 ```
+
+---
+
+### ⚠️ ปัญหา 6: Module Resolution Error ทั่วไป
+
+**วิธีแก้แบบสมบูรณ์:**
+
+```bash
+# 1. ลบ node_modules และ cache
+rm -rf node_modules
+rm -rf .expo
+rm package-lock.json
+
+# 2. ติดตั้งใหม่
+npm install
+
+# 3. ติดตั้ง Expo Router อีกครั้ง
+npx expo install expo-router react-native-safe-area-context react-native-screens expo-linking expo-constants expo-status-bar
+
+# 4. รันพร้อม clear cache
+npx expo start --clear
+```
+
+---
+
+### 🔧 เคล็ดลับการแก้ปัญหา
+
+1. **อ่าน Error Message ให้ดี**
+   - Terminal แสดง Error ชัดเจน
+   - Google Error Message พร้อมคำว่า "expo router"
+
+2. **Clear Cache เป็นประจำ**
+   ```bash
+   npx expo start --clear
+   ```
+
+3. **ใช้ Console.log() Debug**
+   ```typescript
+   console.log('Component loaded');
+   console.log('Jobs data:', jobs);
+   ```
+
+4. **Restart ทุกอย่าง**
+   - กด `Ctrl+C` ใน Terminal
+   - รัน `npx expo start --clear` ใหม่
 
 ---
 
@@ -606,127 +784,17 @@ npx expo start
 
 ### ✅ สิ่งที่เราได้ทำ
 
-1. ✅ สร้างโปรเจค React Native ด้วย Expo Router
-2. ✅ ใช้ TypeScript สำหรับความปลอดภัยของข้อมูล
-3. ✅ ใช้ Nativewind (Tailwind CSS) สำหรับ Styling
-4. ✅ สร้าง File-based Routing ด้วย Expo Router
-5. ✅ สร้าง Dynamic Routes สำหรับหน้ารายละเอียด
-6. ✅ แยก Component และ Data เป็นไฟล์ต่างหาก
+1. ✅ สร้างโปรเจค React Native ด้วย `npx rn-new --nativewind`
+2. ✅ ติดตั้ง Expo Router และ dependencies
+3. ✅ ตั้งค่า package.json ให้ใช้ Expo Router
+4. ✅ สร้างโครงสร้างโฟลเดอร์ `app/`, `types/`, `data/`
+5. ✅ สร้าง File-based Routing
+6. ✅ สร้าง Dynamic Routes สำหรับหน้ารายละเอียด
+7. ✅ ใช้ TypeScript และ Nativewind (Tailwind CSS)
 
-### 🎯 จุดเด่นของ Expo Router
+### 🎯 จุดสำคัญที่ต้องจำ
 
-| คุณสมบัติ | ประโยชน์ |
-|-----------|----------|
-| **File-based Routing** | ไม่ต้องตั้งค่า Navigation ซับซ้อน |
-| **Dynamic Routes** | สร้าง URL แบบ Dynamic ได้ง่าย |
-| **Type Safety** | รองรับ TypeScript เต็มรูปแบบ |
-| **Deep Linking** | รองรับการเปิดแอปจาก Link อัตโนมัติ |
-| **SEO Friendly** | เมื่อ Export เป็น Web ได้ SEO ที่ดี |
-
-### 📚 เอกสารอ้างอิงทั้งหมด
-
-#### Expo Router
-- [Introduction](https://docs.expo.dev/router/introduction/)
-- [File-based Routing](https://docs.expo.dev/router/create-pages/)
-- [Dynamic Routes](https://docs.expo.dev/router/reference/url-parameters/)
-- [Navigation](https://docs.expo.dev/router/navigating-pages/)
-- [Layouts](https://docs.expo.dev/router/layouts/)
-
-#### Nativewind
-- [Official Documentation](https://www.nativewind.dev/)
-- [Quick Start with Expo](https://www.nativewind.dev/quick-starts/expo)
-- [Tailwind CSS Docs](https://tailwindcss.com/docs)
-
-#### React Native
-- [Getting Started](https://reactnative.dev/docs/getting-started)
-- [FlatList API](https://reactnative.dev/docs/flatlist)
-- [TouchableOpacity](https://reactnative.dev/docs/touchableopacity)
-- [SafeAreaView](https://reactnative.dev/docs/safeareaview)
-
-#### TypeScript
-- [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
-- [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
-
-### 🚀 ขั้นตอนต่อไป
-
-เมื่อเข้าใจพื้นฐานแล้ว คุณสามารถพัฒนาต่อได้:
-
-1. **เพิ่มฟีเจอร์ Search**
-   - ค้นหางานตามชื่อตำแหน่ง
-   - ใช้ `useState` และ `filter()`
-
-2. **เพิ่ม Filter**
-   - กรองตามสถานที่
-   - กรองตามช่วงเงินเดือน
-
-3. **เพิ่มหน้า Favorites**
-   - บันทึกงานที่สนใจ
-   - ใช้ `AsyncStorage`
-
-4. **เชื่อมต่อ API**
-   - ดึงข้อมูลจาก Backend จริง
-   - ใช้ `fetch` หรือ `axios`
-
-5. **เพิ่ม Animation**
-   - ใช้ `react-native-reanimated`
-   - ทำ Transition สวยงาม
-
-### 💡 Tips สำหรับผู้เริ่มต้น
-
-1. **อ่าน Error Message**
-   - Error message บอกปัญหาได้ตรง
-   - Google ปัญหาพร้อม Error Message
-
-2. **ใช้ Console.log()**
-   - Debug ด้วย `console.log()`
-   - ดูค่าตัวแปรในแต่ละขั้นตอน
-
-3. **เริ่มจากง่ายไปยาก**
-   - เริ่มจากโครงสร้างพื้นฐาน
-   - ค่อยๆ เพิ่มฟีเจอร์ทีละอย่าง
-
-4. **ศึกษา Documentation**
-   - อ่าน Official Docs เป็นหลัก
-   - ดูตัวอย่างโค้ดใน Docs
-
-5. **ทดลองแก้ไข**
-   - ลองเปลี่ยนสี, ขนาด, Layout
-   - เรียนรู้จากการทดลอง
-
-### 📝 Checklist การสร้างโปรเจค
-
-- [ ] สร้างโปรเจคด้วย `npx rn-new --nativewind`
-- [ ] สร้างโฟลเดอร์ `types/`, `data/`, `components/`
-- [ ] สร้างไฟล์ `types/job.ts`
-- [ ] สร้างไฟล์ `data/jobs.ts`
-- [ ] สร้างไฟล์ `components/JobCard.tsx`
-- [ ] แก้ไขไฟล์ `app/_layout.tsx`
-- [ ] แก้ไขไฟล์ `app/index.tsx`
-- [ ] สร้างไฟล์ `app/job/[id].tsx`
-- [ ] รันโปรเจคด้วย `npx expo start`
-- [ ] ทดสอบการทำงานทั้งหมด
-
----
-
-## 🎉 สรุป
-
-ยินดีด้วย! คุณได้เรียนรู้การสร้างแอป React Native ด้วย **Expo Router** ที่ทันสมัยและใช้งานง่าย
-
-**สิ่งที่ได้เรียนรู้:**
-- ✅ File-based Routing แบบ Next.js
-- ✅ Dynamic Routes สำหรับหน้ารายละเอียด
-- ✅ TypeScript สำหรับความปลอดภัย
-- ✅ Tailwind CSS สำหรับ Styling
-- ✅ Component-based Architecture
-
-**ข้อดีของ Expo Router:**
-- 🚀 รวดเร็ว ไม่ต้องตั้งค่าเยอะ
-- 📱 รองรับ Deep Linking อัตโนมัติ
-- 🎨 เขียน Code น้อยกว่า
-- 🔒 Type-safe ด้วย TypeScript
-
----
-
-**Happy Coding! 🚀**
-
-*เอกสารนี้อัพเดทล่าสุด: 2025*
+| ขั้นตอน | สิ่งที่ต้องทำ |
+|---------|-------------|
+| **1. หลังสร้างโปรเจค** | ติดตั้ง expo-router ทันที |
+| **2. แก้ package.json** | เปลี่ยน main
