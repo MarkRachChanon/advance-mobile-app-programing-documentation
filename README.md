@@ -37,6 +37,7 @@
 ```bash
 npx rn-new it-worker --nativewind
 cd it-worker
+npm install expo-router
 ```
 
 คำสั่งนี้จะสร้างโปรเจคพร้อม:
